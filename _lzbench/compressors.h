@@ -520,4 +520,16 @@ int64_t lzbench_return_0(char *inbuf, size_t insize, char *outbuf, size_t outsiz
         #define lzbench_nvcomp_decompress NULL
 #endif
 
+#ifndef BENCH_REMOVE_SPRINTZ
+        char* lzbench_sprintz_init(size_t insize, size_t level, size_t);
+        void lzbench_sprintz_deinit(char* workmem);
+        int64_t lzbench_sprintz_compress(char *inbuf, size_t insize, char *outbuf, size_t outsize, size_t level, size_t, char* workmem);
+        int64_t lzbench_sprintz_decompress(char *inbuf, size_t insize, char *outbuf, size_t outsize, size_t, size_t, char* workmem);
+#else
+        #define lzbench_sprintz_init NULL
+        #define lzbench_sprintz_deinit NULL
+        #define lzbench_sprintz_compress NULL
+        #define lzbench_sprintz_decompress NULL
+#endif
+
 #endif // LZBENCH_COMPRESSORS_H

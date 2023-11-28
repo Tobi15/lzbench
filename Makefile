@@ -74,8 +74,14 @@ endif
 
 DEFINES     += $(addprefix -I$(SOURCE_PATH),. brotli/include libcsc libdeflate xpack/common xz xz/api xz/check xz/common xz/lz xz/lzma xz/rangecoder zstd/lib zstd/lib/common)
 DEFINES     += -DHAVE_CONFIG_H -DFL2_SINGLETHREAD
-CODE_FLAGS  += -Wno-unknown-pragmas -Wno-sign-compare -Wno-conversion
+INCLUDES    += -march=broadwell
+CODE_FLAGS  += -Wno-unknown-pragmas -Wno-sign-compare -Wno-conversion 
+#-mavx2 -msse4.1 -std=c++0x -Wno-c++11-narrowing
 OPT_FLAGS   ?= -fomit-frame-pointer -fstrict-aliasing -ffast-math
+
+
+
+
 
 
 ifeq ($(BUILD_TYPE),debug)
@@ -86,8 +92,8 @@ else
 	OPT_FLAGS_O3 = $(OPT_FLAGS) -O3 -DNDEBUG
 endif
 
-CFLAGS = $(MOREFLAGS) $(CODE_FLAGS) $(OPT_FLAGS_O3) $(DEFINES)
-CFLAGS_O2 = $(MOREFLAGS) $(CODE_FLAGS) $(OPT_FLAGS_O2) $(DEFINES)
+CFLAGS = $(MOREFLAGS) $(CODE_FLAGS) $(OPT_FLAGS_O3) $(INCLUDES) $(DEFINES) 
+CFLAGS_O2 = $(MOREFLAGS) $(CODE_FLAGS) $(OPT_FLAGS_O2) $(INCLUDES) $(DEFINES)
 LDFLAGS += $(MOREFLAGS)
 
 
@@ -161,6 +167,26 @@ ZSTD_FILES += zstd/lib/dictBuilder/cover.o
 ZSTD_FILES += zstd/lib/dictBuilder/divsufsort.o
 ZSTD_FILES += zstd/lib/dictBuilder/fastcover.o
 ZSTD_FILES += zstd/lib/dictBuilder/zdict.o
+
+#Add sprintz algorithm 
+ifeq "$(DONT_BUILD_SPRINTZ)" "1"
+    DEFINES += -DBENCH_REMOVE_SPRINTZ
+else
+	SPRINTZ_FILES = sprintz/delta.o
+	SPRINTZ_FILES += sprintz/format.o
+	SPRINTZ_FILES += sprintz/online.o
+	SPRINTZ_FILES += sprintz/predict.o
+	SPRINTZ_FILES += sprintz/sprintz_delta_lowdim.o
+	SPRINTZ_FILES += sprintz/sprintz_delta_rle_query.o
+	SPRINTZ_FILES += sprintz/sprintz_delta_rle.o
+	SPRINTZ_FILES += sprintz/sprintz_delta.o
+	SPRINTZ_FILES += sprintz/sprintz_xff_lowdim.o
+	SPRINTZ_FILES += sprintz/sprintz_xff_rle_query.o
+	SPRINTZ_FILES += sprintz/sprintz_xff_rle.o
+	SPRINTZ_FILES += sprintz/sprintz_xff.o
+	SPRINTZ_FILES += sprintz/sprintz.o
+	SPRINTZ_FILES += sprintz/univariate_8b.o
+endif
 
 BRIEFLZ_FILES = brieflz/brieflz.o brieflz/depack.o brieflz/depacks.o
 
@@ -353,7 +379,7 @@ $(NVCOMP_CPP_OBJ): %.cpp.o: %.cpp
 
 _lzbench/lzbench.o: _lzbench/lzbench.cpp _lzbench/lzbench.h
 
-lzbench: $(BZIP2_FILES) $(DENSITY_FILES) $(FASTLZMA2_OBJ) $(ZSTD_FILES) $(GLZA_FILES) $(LZSSE_FILES) $(LZFSE_FILES) $(XPACK_FILES) $(GIPFELI_FILES) $(XZ_FILES) $(LIBLZG_FILES) $(BRIEFLZ_FILES) $(LZF_FILES) $(LZRW_FILES) $(BROTLI_FILES) $(CSC_FILES) $(LZMA_FILES) $(ZLING_FILES) $(QUICKLZ_FILES) $(SNAPPY_FILES) $(ZLIB_FILES) $(LZHAM_FILES) $(LZO_FILES) $(UCL_FILES) $(LZMAT_FILES) $(LZ4_FILES) $(LIBDEFLATE_FILES) $(MISC_FILES) $(NVCOMP_FILES) $(LZBENCH_FILES)
+lzbench: $(BZIP2_FILES) $(DENSITY_FILES) $(FASTLZMA2_OBJ) $(ZSTD_FILES) $(GLZA_FILES) $(LZSSE_FILES) $(LZFSE_FILES) $(XPACK_FILES) $(GIPFELI_FILES) $(XZ_FILES) $(LIBLZG_FILES) $(BRIEFLZ_FILES) $(LZF_FILES) $(LZRW_FILES) $(BROTLI_FILES) $(CSC_FILES) $(LZMA_FILES) $(ZLING_FILES) $(QUICKLZ_FILES) $(SNAPPY_FILES) $(ZLIB_FILES) $(LZHAM_FILES) $(LZO_FILES) $(UCL_FILES) $(LZMAT_FILES) $(LZ4_FILES) $(LIBDEFLATE_FILES) $(MISC_FILES) $(NVCOMP_FILES) $(LZBENCH_FILES) $(SPRINTZ_FILES)
 	$(CXX) $^ -o $@ $(LDFLAGS)
 	@echo Linked GCC_VERSION=$(GCC_VERSION) CLANG_VERSION=$(CLANG_VERSION) COMPILER=$(COMPILER)
 
@@ -370,4 +396,4 @@ lzbench: $(BZIP2_FILES) $(DENSITY_FILES) $(FASTLZMA2_OBJ) $(ZSTD_FILES) $(GLZA_F
 	$(CXX) $(CFLAGS) $< -c -o $@
 
 clean:
-	rm -rf lzbench lzbench.exe *.o _lzbench/*.o bzip2/*.o fast-lzma2/*.o slz/*.o zstd/lib/*.o zstd/lib/*.a zstd/lib/common/*.o zstd/lib/compress/*.o zstd/lib/decompress/*.o zstd/lib/dictBuilder/*.o lzsse/lzsse2/*.o lzsse/lzsse4/*.o lzsse/lzsse8/*.o lzfse/*.o xpack/lib/*.o blosclz/*.o gipfeli/*.o xz/*.o xz/common/*.o xz/check/*.o xz/lzma/*.o xz/lz/*.o xz/rangecoder/*.o liblzg/*.o lzlib/*.o brieflz/*.o brotli/common/*.o brotli/enc/*.o brotli/dec/*.o libcsc/*.o wflz/*.o lzjb/*.o lzma/*.o density/buffers/*.o density/algorithms/*.o density/algorithms/cheetah/core/*.o density/algorithms/*.o density/algorithms/lion/forms/*.o density/algorithms/lion/core/*.o density/algorithms/chameleon/core/*.o density/*.o density/structure/*.o pithy/*.o glza/*.o libzling/*.o yappy/*.o shrinker/*.o fastlz/*.o ucl/*.o zlib/*.o lzham/*.o lzmat/*.o lz4/*.o crush/*.o lzf/*.o lzrw/*.o lzo/*.o snappy/*.o quicklz/*.o tornado/*.o libdeflate/lib/*.o libdeflate/lib/x86/*.o libdeflate/lib/arm/*.o nakamichi/*.o nvcomp/*.o
+	rm -rf lzbench lzbench.exe *.o _lzbench/*.o bzip2/*.o fast-lzma2/*.o slz/*.o zstd/lib/*.o zstd/lib/*.a zstd/lib/common/*.o zstd/lib/compress/*.o zstd/lib/decompress/*.o zstd/lib/dictBuilder/*.o lzsse/lzsse2/*.o lzsse/lzsse4/*.o lzsse/lzsse8/*.o lzfse/*.o xpack/lib/*.o blosclz/*.o gipfeli/*.o xz/*.o xz/common/*.o xz/check/*.o xz/lzma/*.o xz/lz/*.o xz/rangecoder/*.o liblzg/*.o lzlib/*.o brieflz/*.o brotli/common/*.o brotli/enc/*.o brotli/dec/*.o libcsc/*.o wflz/*.o lzjb/*.o lzma/*.o density/buffers/*.o density/algorithms/*.o density/algorithms/cheetah/core/*.o density/algorithms/*.o density/algorithms/lion/forms/*.o density/algorithms/lion/core/*.o density/algorithms/chameleon/core/*.o density/*.o density/structure/*.o pithy/*.o glza/*.o libzling/*.o yappy/*.o shrinker/*.o fastlz/*.o ucl/*.o zlib/*.o lzham/*.o lzmat/*.o lz4/*.o crush/*.o lzf/*.o lzrw/*.o lzo/*.o snappy/*.o quicklz/*.o tornado/*.o libdeflate/lib/*.o libdeflate/lib/x86/*.o libdeflate/lib/arm/*.o nakamichi/*.o nvcomp/*.o sprintz/*.o

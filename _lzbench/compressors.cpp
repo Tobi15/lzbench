@@ -1762,6 +1762,36 @@ int64_t lzbench_nakamichi_decompress(char *inbuf, size_t insize, char *outbuf, s
 
 #endif
 
+#ifndef BENCH_REMOVE_SPRINTZ
+#include "sprintz/sprintz.h"
+#include "sprintz/univariate_8b.h"
+#include "sprintz/sprintz_delta.h"
+#include "sprintz/sprintz_xff.h"
+#include "sprintz/bitpack.h"
+#include "sprintz/delta.h"
+#include "sprintz/predict.h"
+#include "sprintz/query.hpp"
+#include "sprintz/sprintz_delta.h"
+
+char* lzbench_sprintz_init(size_t insize, size_t level, size_t){
+
+}
+        
+void lzbench_sprintz_deinit(char* workmem){
+
+}
+
+int64_t lzbench_sprintz_compress(char *inbuf, size_t insize, char *outbuf, size_t outsize, size_t level, size_t, char* workmem){
+
+    printf("sprintz called\n");
+    return sprintz_compress_delta_8b((uint8_t*)inbuf, insize, (int8_t*)outbuf, level);
+}
+
+int64_t lzbench_sprintz_decompress(char *inbuf, size_t insize, char *outbuf, size_t outsize, size_t, size_t, char* workmem){
+    return sprintz_decompress_delta_8b((int8_t*)inbuf, (uint8_t*)outbuf);
+}
+#endif
+
 #ifdef BENCH_HAS_CUDA
 #include <cuda_runtime.h>
 

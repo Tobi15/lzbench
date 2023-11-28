@@ -136,7 +136,7 @@ typedef struct
 
 
 
-#define LZBENCH_COMPRESSOR_COUNT 72
+#define LZBENCH_COMPRESSOR_COUNT 73
 
 static const compressor_desc_t comp_desc[LZBENCH_COMPRESSOR_COUNT] =
 {
@@ -209,19 +209,22 @@ static const compressor_desc_t comp_desc[LZBENCH_COMPRESSOR_COUNT] =
     { "zstdLDM",    "1.5.5",       1,  22,    0,       0, lzbench_zstd_LDM_compress,   lzbench_zstd_decompress,       lzbench_zstd_LDM_init,   lzbench_zstd_deinit },
     { "zstd22LDM",  "1.5.5",       1,  22,   22,       0, lzbench_zstd_LDM_compress,   lzbench_zstd_decompress,       lzbench_zstd_LDM_init,   lzbench_zstd_deinit },
     { "zstd24LDM",  "1.5.5",       1,  22,   24,       0, lzbench_zstd_LDM_compress,   lzbench_zstd_decompress,       lzbench_zstd_LDM_init,   lzbench_zstd_deinit },
+    { "sprintz",    "0.0.0",       1,   128,    0,       0, lzbench_sprintz_compress,    lzbench_sprintz_decompress,    lzbench_sprintz_init,    lzbench_sprintz_deinit },
     { "nakamichi",  "okamigan",    0,   0,    0,       0, lzbench_nakamichi_compress,  lzbench_nakamichi_decompress,  NULL,                    NULL },
     { "cudaMemcpy", "",            0,   0,    0,       0, lzbench_cuda_return_0,       lzbench_cuda_memcpy,           lzbench_cuda_init,       lzbench_cuda_deinit },
     { "nvcomp_lz4", "1.2.2",       0,   5,    0,       0, lzbench_nvcomp_compress,     lzbench_nvcomp_decompress,     lzbench_nvcomp_init,     lzbench_nvcomp_deinit },
+    
 };
 
 
 
-#define LZBENCH_ALIASES_COUNT 13
+#define LZBENCH_ALIASES_COUNT 14
 
 static const alias_desc_t alias_desc[LZBENCH_ALIASES_COUNT] =
 {
-    { "fast", "density/fastlz,10,11,12,13,14/lz4/lz4fast,3,17/lzf/lzfse/lzjb/lzo1b,1/lzo1c,1/lzo1f,1/lzo1x,1/lzo1y,1/" \
-              "lzrw,1,3,4,5/lzsse4fast/lzsse8fast/lzvn/pithy,0,3,6,9/quicklz,1,2/shrinker/snappy/tornado,1,2,3/zstd,1,2,3,4,5" }, // default alias
+   // { "fast", "density/fastlz,10,11,12,13,14/lz4/lz4fast,3,17/lzf/lzfse/lzjb/lzo1b,1/lzo1c,1/lzo1f,1/lzo1x,1/lzo1y,1/" \
+              "lzrw,1,3,4,5/lzsse4fast/lzsse8fast/lzvn/pithy,0,3,6,9/quicklz,1,2/shrinker/snappy/tornado,1,2,3/zstd,1,2,3,4,5/sprintz/" }, // default alias
+    { "fast", "sprintz/"},
 #if !defined(__arm__) && !defined(__aarch64__)
     { "all",  "blosclz,1,3,6,9/brieflz,1,3,6,8/brotli,0,2,5,8,11/bzip2,1,5,9/" \
               "crush,0,1,2/csc,1,3,5/density,1,2,3/fastlz,1,2/fastlzma2,1,3,5,8,10/gipfeli/libdeflate,1,3,6,9,12/lz4/lz4fast,3,17/lz4hc,1,4,9,12/" \
@@ -249,6 +252,7 @@ static const alias_desc_t alias_desc[LZBENCH_ALIASES_COUNT] =
     { "lzo",   "lzo1/lzo1a/lzo1b/lzo1c/lzo1f/lzo1x/lzo1y/lzo1z/lzo2a" },
     { "ucl",   "ucl_nrv2b/ucl_nrv2d/ucl_nrv2e" },
     { "cuda",  "cudaMemcpy/nvcomp_lz4,0,1,3,5" },
+    { "sprintz",  "sprintz" },
 };
 
 #endif
